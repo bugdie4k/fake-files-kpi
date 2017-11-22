@@ -94,7 +94,7 @@ I thought it would be more convenient for repl.
 (defun menu ()
   (loop
     (force-format "~&%-> ")
-    (let ((cmds (split-sequence:split-sequence #\space (read-line))))
+    (let ((cmds (split-sequence:split-sequence #\space (read-line) :remove-empty-subseqs t)))
       (switch ((car cmds) :test string-equal)
         ("show" (@show))
         ("help" (help))
