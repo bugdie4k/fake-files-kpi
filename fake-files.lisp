@@ -21,10 +21,12 @@
   data)
 
 (defmacro define-ff-action (name &rest lambda-list/body)
-  "Defines function with the `lambda-list/body' body
-and a macro with the `name' which calls this function 
+  "Defines the `name' function with the `lambda-list/body' body
+and a macro with the i`name' which calls this function 
 with all the same arguments except that the first is 
-stringified."
+stringified. 
+I thought it would be more convenient for repl.
+"
   (let ((macro-name (symbolicate "I" (symbol-name name))))
     `(progn
        (defun ,name ,@lambda-list/body)
