@@ -50,12 +50,12 @@ I thought it would be more convenient for repl.
   (trees:insert (make-ffile :name c :data data) *tree*))
 
 (define-ff-action @del (c)
-  (trees:delete c *tree*))
+  (multiple-value-bind (res status) (trees:delete c *tree*)
+    (values res status)))
 
 (define-ff-action @get (c)
-  (if-let ((res (trees:find c *tree*)))
-    (values (ffile-data res) t)
-    (values nil nil)))
+  (multiple-value-bind (res status) (trees:find c *tree*)
+    (values res status)))
 
 (defun pprint-tree (tree &optional (stream *standard-output*))
   (labels ((recursive-print (node level char)
@@ -103,9 +103,12 @@ I thought it would be more convenient for repl.
                   (force-format "added file ~A~%" (second cmds))))
         ("get"  (multiple-value-bind (data status) (@get (second cmds))
                     (if status
-                        (force-format "contents of ~A~%~A~%" (second cmds) data)
-                        (force-format "no such file ~A" (second cmds)))))
-        ("del"  (@del (second cmds)))
+                        (force-format "contents of file ~A:~%~A~%" (second cmds) (ffile-data data))
+                        (force-format "no such file as~A" (second cmds)))))
+        ("del"  (multiple-value-bind (data status) (@del (second cmds))
+                  (if status
+                      (force-format "deleted file ~A~%" (ffile-name data))
+                      (force-format "no such file as ~A" (second cmds)))))
         ("quit" (return))
         ("q" (return))
         (t (force-format "~A is not a command~%" (car cmds)))))))
